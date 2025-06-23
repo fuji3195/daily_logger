@@ -1,0 +1,8 @@
+title: "Daily Logger Docs"
+markdown: kramdown        # デフォルト
+theme: minima             # GitHub Pages 既定テーマ
+plugins:
+  - jekyll-toc            # 目次プラグイン
+toc:
+  min_level: 2            # h2 から拾う
+  max_level: 3            # h3 まで拾う
