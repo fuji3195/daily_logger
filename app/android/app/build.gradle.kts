@@ -7,8 +7,8 @@ plugins {
 
 android {
     namespace = "com.fuji3195.app"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 35
+    ndkVersion = "29.0.13599879"   // Kotlin DSL 版
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

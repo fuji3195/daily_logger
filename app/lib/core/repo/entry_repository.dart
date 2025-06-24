@@ -26,11 +26,13 @@ class EntryRepository {
     );
   }
 
-  Stream<List<Entry>> watchLatest(String categoryId) => (db.select(db.entries)
-        ..where((tbl) => tbl.categoryId.equals(categoryId))
-        ..orderBy([(tbl) => OrderingTerm.desc(tbl.ts)])
-        ..limit(30))
-      .watch();
+  /// カテゴリ別・直近 30 件
+  Stream<List<Entry>> watchLatest(String categoryId) =>
+      (db.select(db.entries)
+            ..where((t) => t.categoryId.equals(categoryId))
+            ..orderBy([(t) => OrderingTerm.desc(t.ts)])
+            ..limit(30))
+          .watch();
 }
 
 final entryRepoProvider =

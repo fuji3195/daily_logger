@@ -12,31 +12,25 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     routes: [
+      GoRoute( path: '/'        , name: 'dashboard', builder: (_, __) => const DashboardPage(),),
+      GoRoute( path: '/add'     , name: 'add'      , builder: (_, __) => const AddEntryPage(),),
+      GoRoute( path: '/category', name: 'category' , builder: (_, __) => const CategoryPage(),),
+      GoRoute( path: '/settings', name: 'settings' , builder: (_, __) => const SettingsPage(),),
       GoRoute(
-        path: '/',
-        name: 'dashboard',
-        builder: (_, __) => const DashboardPage(),
-      ),
-      GoRoute(
-        path: '/add',
-        name: 'add',
-        builder: (_, __) => const AddEntryPage(),
-      ),
-      GoRoute(
-        path: '/history',
+        path: '/history/:catId',
         name: 'history',
-        builder: (_, __) => const HistoryPage(),
+        builder: (context, state) {
+          final catId = state.pathParameters['catId'];
+          if (catId == null || catId.isEmpty) {
+            // パラメータが無い／空の場合はエラーページを表示
+            return const Scaffold(
+              body: Center(child: Text('カテゴリ ID が取得できません')),
+            );
+          }
+          return HistoryPage(catId: catId);
+        },
       ),
-      GoRoute(
-        path: '/category',
-        name: 'category',
-        builder: (_, __) => const CategoryPage(),
-      ),
-      GoRoute(
-        path: '/settings',
-        name: 'settings',
-        builder: (_, __) => const SettingsPage(),
-      ),
+
     ],
   );
 });
