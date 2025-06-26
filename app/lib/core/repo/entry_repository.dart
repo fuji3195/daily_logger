@@ -37,3 +37,47 @@ class EntryRepository {
 
 final entryRepoProvider =
     Provider<EntryRepository>((ref) => EntryRepository(ref.read(dbProvider)));
+
+extension EntryRepositoryAgg on EntryRepository {
+  /// 直近 N 日の日次平均を返す
+  Stream<List<EntryDaily>> watchDaily(String catId, int days) {
+    final from = DateTime.now().subtract(Duration(days: days));
+    final query = (db.select(db.entries)
+          ..where((t) => t.categoryId.equals(catId) & t.ts.isBiggerOrEqualValue(from)))
+        .watch();
+
+    return query.map((rows) {
+      final byDay = <DateTime, List<Entry>>{};
+      for (final r in rows) {
+        final day = DateTime(r.ts.year, r.ts.month, r.ts.day);
+        byDay.putIfAbsent(day, () => []).add(r);
+      }
+      return byDay.entries
+          .map((e) => EntryDaily(
+                day: e.key,
+                avg: e.value.map((r) => r.valueNum).reduce((a, b) => a + b) /
+                    e.value.length,
+              ))
+          .toList()
+        ..sort((a, b) => a.day.compareTo(b.day));
+    });
+  }
+}
+
+class EntryDaily {
+  EntryDaily({required this.day, required this.avg});
+  final DateTime day;
+  final double avg;
+}
+
+extension EntryRepositoryRange on EntryRepository {
+  /// 指定期間 [from]-[to] の全エントリ
+  Stream<List<Entry>> watchRange(String catId, DateTime from, DateTime to) =>
+      (db.select(db.entries)
+            ..where((t) =>
+                t.categoryId.equals(catId) &
+                t.ts.isBiggerOrEqualValue(from) &
+                t.ts.isSmallerOrEqualValue(to))
+            ..orderBy([(t) => OrderingTerm.desc(t.ts)]))
+          .watch();
+}
